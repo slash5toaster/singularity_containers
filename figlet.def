@@ -1,0 +1,8 @@
+bootstrap:docker
+From:debian:latest
+
+%post
+apt-get update -y && apt-get install -y apt-utils figlet ddate --no-install-recommends
+mkdir -vp /gne/research/scratch
+mkdir -vp /gne/home
+cp figlet_entry.sh /
