@@ -1,8 +1,16 @@
 bootstrap:docker
 From:debian:latest
 
+%setup
+   echo $(pwd)
+   echo $SINGULARITY_ROOTFS
+   cp -v figlet_entry.sh $SINGULARITY_ROOTFS
+
+%runscript
+ 
+   exec /figlet_entry.sh "$@"
+
 %post
-apt-get update -y && apt-get install -y apt-utils figlet ddate --no-install-recommends
-mkdir -vp /gne/research/scratch
-mkdir -vp /gne/home
-cp figlet_entry.sh /
+  apt-get update -qq -y && apt-get install -q -y apt-utils figlet ddate --no-install-recommends
+  mkdir -vp --mode=775 /gne/research/scratch
+  mkdir -vp --mode=775 /gne/home
