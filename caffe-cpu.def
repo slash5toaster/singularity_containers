@@ -1,9 +1,15 @@
 Bootstrap: docker
-From:  bvlc/caffe:cpu 
+From:  bvlc/caffe:cpu
 
+%environment
+    export PATH=/opt/caffe/build/tools:/opt/caffe/python:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+    export PYCAFFE_ROOT=/opt/caffe/python
+    export PYTHONPATH=/opt/caffe/python:
+    export CAFFE_ROOT=/opt/caffe
+    
 %runscript
- 
-    exec caffe "$@"
+    exec /opt/caffe/build/tools/caffe "$@"
 
 %post
-
+     mkdir -vp --mode=775 /gne/research/scratch
+     mkdir -vp --mode=775 /gne/home
