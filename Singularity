@@ -6,14 +6,14 @@ From:centos:centos7
 # "project"="gRED HPC"
 
 export LUAROCKS_VER=2.4.2
-echo "export LUAROCKS_VER=2.4.2" >> /environment
 export LUA_VER=5.1.4
-echo "export LUA_VER=5.1.4" >> /environment
-export EB_VER=3.3.0
-echo "export EB_VER=3.3.0" >> /environment
 export LMOD_VER=7.6
-echo "export LMOD_VER=7.6" >> /environment
+export EB_VER=3.3.0
 export APPS_PREFIX=/gstore/apps
+echo "export LUAROCKS_VER=2.4.2" >> /environment
+echo "export LUA_VER=5.1.4" >> /environment
+echo "export LMOD_VER=7.6" >> /environment
+echo "export EB_VER=3.3.0" >> /environment
 echo "export APPS_PREFIX=/gstore/apps" >> /environment
 
 groupadd gredsys_pg -g 2376
@@ -26,45 +26,47 @@ yum install -y build-essential libtool autotools-dev automake autoconf git scree
 yum install -y epel-release
 yum install -y createrepo
 yum install -y emacs emacs-common \
-                   libotf netpbm netpbm-progs \
-                   readline readline-devel \
-                   xterm xorg-x11-xauth xorg-x11-server-utils \
-                   xorg-x11-server-common \
-                   xorg-x11-server-Xorg xorg-x11-proto-devel \
-                   libXt-devel libX11-devel gcc-plugin-devel \
-                   ruby-devel gcc make rpm-build rubygems \
-                   openssl-devel libssl-dev libopenssl-devel
+               libotf netpbm netpbm-progs \
+               readline readline-devel \
+               xterm xorg-x11-xauth xorg-x11-server-utils \
+               xorg-x11-server-common \
+               xorg-x11-server-Xorg xorg-x11-proto-devel \
+               libXt-devel libX11-devel gcc-plugin-devel \
+               ruby-devel gcc make rpm-build rubygems \
+               openssl-devel libssl-dev libopenssl-devel
 
 yum install lua-devel lua tcl-devel tcl -y
 yum clean all
 
 mkdir -vp --mode 2775 ${APPS_PREFIX}
 
+# Install LuaRocks - lmod prereq
 cd /tmp/
 wget http://luarocks.github.io/luarocks/releases/luarocks-${LUAROCKS_VER}.tar.gz
 tar -xzvf luarocks-${LUAROCKS_VER}.tar.gz
 cd /tmp/luarocks-${LUAROCKS_VER}
 ./configure --prefix=${APPS_PREFIX}/luarocks/${LUAROCKS_VER} ; \
-    make clean ; \
-    make build ; \
-    make install
+  make clean ; \
+  make build ; \
+  make install
 
 cd ${APPS_PREFIX}
 cp luarocks.sh /etc/profile.d/luarocks.sh
 cp luarocks.csh /etc/profile.d/luarocks.csh
 
-export LUAROCKS_PREFIX=${APPS_PREFIX}/luarocks/${LUAROCKS_VER}
-echo "export LUAROCKS_PREFIX=${APPS_PREFIX}/luarocks/${LUAROCKS_VER}" >> /environment
 export PATH=$PATH:${LUAROCKS_PREFIX}/bin/:${LUAROCKS_PREFIX}/lib/
-echo "export PATH=$PATH:${LUAROCKS_PREFIX}/bin/:${LUAROCKS_PREFIX}/lib/" >> /environment
+export LUAROCKS_PREFIX=${APPS_PREFIX}/luarocks/${LUAROCKS_VER}
 export LUA_PATH=${LUAROCKS_PREFIX}/share/lua/5.1/?.lua;${LUAROCKS_PREFIX}/share/lua/5.1/?/init.lua;;
-echo "export LUA_PATH=${LUAROCKS_PREFIX}/share/lua/5.1/?.lua;${LUAROCKS_PREFIX}/share/lua/5.1/?/init.lua;;" >> /environment
 export LUA_CPATH=${LUAROCKS_PREFIX}/lib/lua/5.1/?.so;;
+echo "export PATH=$PATH:${LUAROCKS_PREFIX}/bin/:${LUAROCKS_PREFIX}/lib/" >> /environment
+echo "export LUAROCKS_PREFIX=${APPS_PREFIX}/luarocks/${LUAROCKS_VER}" >> /environment
+echo "export LUA_PATH=${LUAROCKS_PREFIX}/share/lua/5.1/?.lua;${LUAROCKS_PREFIX}/share/lua/5.1/?/init.lua;;" >> /environment
 echo "export LUA_CPATH=${LUAROCKS_PREFIX}/lib/lua/5.1/?.so;;" >> /environment
 
 luarocks install luaposix
 luarocks install luafilesystem
 
+## install Lmod
 cd /tmp/
 git clone https://github.com/TACC/Lmod.git
 cd /tmp/Lmod
